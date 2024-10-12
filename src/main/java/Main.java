@@ -1,4 +1,3 @@
-import gemstones.Gemstone;
 import gemstones.imp.Agate;
 import gemstones.imp.Diamond;
 import gemstones.imp.Emerald;
