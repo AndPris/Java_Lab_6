@@ -97,4 +97,30 @@ public abstract class Gemstone {
         return this.getClass().getSimpleName() + " is a " + this.getClass().getSuperclass().getSimpleName()
                 + " with weight " + weight + " carat, price " + price + "$ and transparency " + transparency + ".";
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if(!(obj instanceof Gemstone))
+            return false;
+
+        if(this.getClass() != obj.getClass())
+            return false;
+
+        Gemstone gemstone = (Gemstone) obj;
+
+        if(price != gemstone.price)
+            return false;
+
+        if(transparency != gemstone.transparency)
+            return false;
+
+        if(weight != gemstone.weight)
+            return false;
+
+        return true;
+    }
 }

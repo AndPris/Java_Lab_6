@@ -13,6 +13,6 @@ public class Main {
 //        t.add(new Integer(2));
 //        t.add(2, new Integer(3));
 //        t.forEach(System.out::println);
-        t.ret
+//        t.sub
     }
 }

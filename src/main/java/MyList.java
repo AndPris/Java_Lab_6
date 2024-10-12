@@ -132,6 +132,18 @@ public class MyList implements List<Gemstone> {
         return currentAmountOfElements == 0;
     }
 
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        Object[] cArray = c.toArray();
+        for (Object o : cArray)
+            if (!contains(o))
+                return false;
+
+        return true;
+    }
+
+
     @Override
     public boolean contains(Object o) {
         if(!(o instanceof Gemstone gemstone))
@@ -144,15 +156,12 @@ public class MyList implements List<Gemstone> {
         return false;
     }
 
-    @Override
-    public Iterator<Gemstone> iterator() {
-        return new GemstoneIterator();
-    }
 
     @Override
     public Object[] toArray() {
         return Arrays.copyOf(elements, currentAmountOfElements);
     }
+
 
     @Override
     public <T> T[] toArray(T[] a) {
@@ -164,6 +173,18 @@ public class MyList implements List<Gemstone> {
             a[currentAmountOfElements] = null;
 
         return a;
+    }
+
+
+    @Override
+    public List<Gemstone> subList(int fromIndex, int toIndex) {
+        if(fromIndex < 0 || toIndex > currentAmountOfElements || fromIndex > toIndex)
+            throw new IndexOutOfBoundsException("Invalid index");
+
+        Gemstone[] elementsToReturn = new Gemstone[toIndex-fromIndex];
+        System.arraycopy(elements, fromIndex, elementsToReturn, 0, toIndex - fromIndex);
+
+        return List.of(elementsToReturn);
     }
 
     @Override
@@ -187,29 +208,20 @@ public class MyList implements List<Gemstone> {
     }
 
     @Override
-    public boolean remove(Object o) {
-        int indexToRemove = -1;
-        for(int i = 0; i < currentAmountOfElements; ++i)
-            if(elements[i].equals(o)) {
-                indexToRemove = i;
-                break;
-            }
+    public void add(int index, Gemstone element) {
+        if(index < 0 || index > currentAmountOfElements)
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + currentAmountOfElements);
 
-        if(indexToRemove == -1)
-            return false;
+        if(currentAmountOfElements == currentMaxSize)
+            extend();
 
-        remove(indexToRemove);
-        return true;
-    }
+        Gemstone[] copy = new Gemstone[currentMaxSize];
+        System.arraycopy(elements, 0, copy, 0, index);
+        copy[index] = element;
+        System.arraycopy(elements, index, copy, index+1, currentAmountOfElements - index - 1);
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        Object[] cArray = c.toArray();
-        for (Object o : cArray)
-            if (!contains(o))
-                return false;
-
-        return true;
+        ++currentAmountOfElements;
+        elements = copy;
     }
 
     @Override
@@ -246,12 +258,47 @@ public class MyList implements List<Gemstone> {
     }
 
     @Override
+    public boolean remove(Object o) {
+        int indexToRemove = -1;
+        for(int i = 0; i < currentAmountOfElements; ++i)
+            if(elements[i].equals(o)) {
+                indexToRemove = i;
+                break;
+            }
+
+        if(indexToRemove == -1)
+            return false;
+
+        remove(indexToRemove);
+        return true;
+    }
+
+
+    @Override
+    public Gemstone remove(int index) {
+        if(index < 0 || index >= currentAmountOfElements)
+            throw new IndexOutOfBoundsException("Index out of range");
+
+        Gemstone elementToRemove = elements[index];
+
+        for(int i = index; i < currentAmountOfElements - 1; ++i)
+            elements[i] = elements[i+1];
+
+        --currentAmountOfElements;
+        elements[currentAmountOfElements] = null;
+
+        return elementToRemove;
+    }
+
+
+    @Override
     public boolean removeAll(Collection<?> c) {
         int currentAmountOfElementsAtStart = currentAmountOfElements;
         for(Object g : c)
             remove(g);
         return currentAmountOfElementsAtStart != currentAmountOfElements;
     }
+
 
     @Override
     public boolean retainAll(Collection<?> c) {
@@ -291,38 +338,6 @@ public class MyList implements List<Gemstone> {
         return elementToReturn;
     }
 
-    @Override
-    public void add(int index, Gemstone element) {
-        if(index < 0 || index > currentAmountOfElements)
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + currentAmountOfElements);
-
-        if(currentAmountOfElements == currentMaxSize)
-            extend();
-
-        Gemstone[] copy = new Gemstone[currentMaxSize];
-        System.arraycopy(elements, 0, copy, 0, index);
-        copy[index] = element;
-        System.arraycopy(elements, index, copy, index+1, currentAmountOfElements - index - 1);
-
-        ++currentAmountOfElements;
-        elements = copy;
-    }
-
-    @Override
-    public Gemstone remove(int index) {
-        if(index < 0 || index >= currentAmountOfElements)
-            throw new IndexOutOfBoundsException("Index out of range");
-
-        Gemstone elementToRemove = elements[index];
-
-        for(int i = index; i < currentAmountOfElements - 1; ++i)
-            elements[i] = elements[i+1];
-
-        --currentAmountOfElements;
-        elements[currentAmountOfElements] = null;
-
-        return elementToRemove;
-    }
 
     @Override
     public int indexOf(Object o) {
@@ -353,6 +368,11 @@ public class MyList implements List<Gemstone> {
     }
 
     @Override
+    public Iterator<Gemstone> iterator() {
+        return new GemstoneIterator();
+    }
+
+    @Override
     public ListIterator<Gemstone> listIterator() {
         return new GemstoneListIterator(0);
     }
@@ -363,16 +383,5 @@ public class MyList implements List<Gemstone> {
             throw new IndexOutOfBoundsException("Index: " + index);
 
         return new GemstoneListIterator(index);
-    }
-
-    @Override
-    public List<Gemstone> subList(int fromIndex, int toIndex) {
-        if(fromIndex < 0 || toIndex >= currentAmountOfElements || fromIndex > toIndex)
-            throw new IndexOutOfBoundsException("Invalid index");
-
-        Gemstone[] elementsToReturn = new Gemstone[toIndex-fromIndex];
-        System.arraycopy(elements, fromIndex, elementsToReturn, 0, toIndex - fromIndex);
-
-        return List.of(elementsToReturn);
     }
 }
