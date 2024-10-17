@@ -414,7 +414,7 @@ public class MyList implements List<Gemstone> {
     }
 
     /**
-     * Doubles the size of the internal array when the list's capacity is reached.
+     * Extends the size of the internal array when the list's capacity is reached.
      */
     private void extend() {
         currentMaxSize = (int) (currentMaxSize * extensionRate);
